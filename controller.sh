@@ -8,7 +8,7 @@ sudo apt-get upgrade -y python
 
 
 touch host
-sudo sed -e "s/[ 	]*127.0.0.1[ 	]*localhost[ 	]*$/127.0.0.1 localhost $HOSTNAME/" /etc/hosts > hosts
+sudo sed -e "s/[ 	]*127.0.0.1[ 	]*localhost[ 	]*$/127.0.0.1 localhost $HOSTNAME/" /etc/hosts > host
 sudo cp host /etc/hosts
 
 chown cc:cc /home/cc 
@@ -20,9 +20,56 @@ git clone https://github.com/openstack-dev/devstack.git -b stable/liberty
 
 cd devstack
 
-git clone https://github.com/BAbrandon/ScriptsForHeat.git
+#git clone https://github.com/BAbrandon/ScriptsForHeat.git
 
-cp /ScriptsForHeat/controller.conf local.conf
+cat <<EOF | cat > local.conf
+
+[[local|localrc]]
+#credential
+SERVICE_TOKEN=azertytoken
+ADMIN_PASSWORD=secret
+MYSQL_PASSWORD=secret
+RABBIT_PASSWORD=secret
+SERVICE_PASSWORD=secret
+
+
+
+#network
+FLAT_INTERFACE=eth0
+FLOATING_RANGE=10.241.254.0/24
+
+PUBLIC_NETWORK_GATEWAY=10.241.254.253
+FIXED_RANGE=192.168.1.0/24
+NETWORK_GATEWAY=192.168.1.1
+FIXED_NETWORK_SIZE=256
+#HOST_IP=
+
+#multi_host
+MULTI_HOST=1
+
+
+# Enable Logging
+LOGFILE=/opt/stack/logs/stack.sh.log
+VERBOSE=True
+LOG_COLOR=True
+SCREEN_LOGDIR=/opt/stack/logs
+
+#service
+disable_service n-net
+enable_service q-svc
+enable_service q-agt
+enable_service q-dhcp
+enable_service q-l3
+enable_service q-meta
+enable_service neutron
+enable_service q-fwaas
+enable_service q-vpn
+enable_service q-lbaas
+Q_PLUGIN=ml2
+Q_ML2_TENANT_NETWORK_TYPE=vxlan
+
+
+EOF
 
 VAR=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/')
 
@@ -39,12 +86,12 @@ sudo cp sysctl.conf /etc/sysctl.conf
 
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
-./devstack/stack.sh
+./stack.sh
 
-./unstack.sh
-./clean.sh
+#./unstack.sh
+#./clean.sh
 
-sudo rm -rf /etc/libvirt/qemu/inst*
+#sudo rm -rf /etc/libvirt/qemu/inst*
 
-sudo virsh list | grep inst | awk '{print $1}' | xargs -n1 virsh
-destroy
+#sudo virsh list | grep inst | awk '{print $1}' | xargs -n1 virsh
+#destroy
