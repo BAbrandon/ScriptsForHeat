@@ -7,9 +7,9 @@ sudo apt-get install -y git python-pip vim
 sudo apt-get upgrade -y python
 
 
-sudo touch hosts
-sudo sed -e "s/[ 	]*127.0.0.1[ 	]*localhost[ 	]*$/127.0.0.1 localhost $HOSTNAME/" > hosts
-sudo cp hosts /etc/hosts
+touch host
+sudo sed -e "s/[ 	]*127.0.0.1[ 	]*localhost[ 	]*$/127.0.0.1 localhost $HOSTNAME/" /etc/hosts > hosts
+sudo cp host /etc/hosts
 
 chown cc:cc /home/cc 
 cd /home/cc
