@@ -22,6 +22,15 @@ cd devstack
 
 #git clone https://github.com/BAbrandon/ScriptsForHeat.git
 
+cat <<EOF | cat > /etc/network/interfaces
+auto eth0
+iface eth0 inet static 
+	address 192.168.0.133
+	netmask 255.255.255.0
+	gateway 192.168.0.1
+EOF
+
+
 cat <<EOF | cat > local.conf
 
 [[local|localrc]]
@@ -36,12 +45,9 @@ SERVICE_PASSWORD=secret
 
 #network
 FLAT_INTERFACE=eth0
-FLOATING_RANGE=10.241.254.0/24
-
-PUBLIC_NETWORK_GATEWAY=10.241.254.253
 FIXED_RANGE=192.168.1.0/24
 NETWORK_GATEWAY=192.168.1.1
-FIXED_NETWORK_SIZE=256
+FIXED_NETWORK_SIZE=4096
 #HOST_IP=
 
 #multi_host
