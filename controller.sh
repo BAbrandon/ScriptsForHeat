@@ -21,15 +21,18 @@ git clone https://github.com/openstack-dev/devstack.git -b stable/liberty
 cd devstack
 
 #git clone https://github.com/BAbrandon/ScriptsForHeat.git
-
-cat <<EOF | cat > /etc/network/interfaces
+touch interfaces
+cat <<EOF | cat > interfaces
 auto eth0
 iface eth0 inet static 
 	address 192.168.0.133
 	netmask 255.255.255.0
 	gateway 192.168.0.1
 EOF
-
+sudo cp -f interfaces /etc/network/
+#made change to interface have to bring down and up 
+ifdown
+ifup
 
 cat <<EOF | cat > local.conf
 
@@ -81,6 +84,20 @@ VAR=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'
 
 printf '\nHOST_IP=%s'$VAR'\n' >> local.conf
 
+
+
+touch interfaces
+cat <<EOF | cat > interfaces
+auto eth0
+iface eth0 inet static 
+        netmask 255.255.255.0
+        gateway 192.168.0.1
+EOF
+printf '	address '$VAR'\n' >> interfaces
+sudo cp -f interfaces /etc/network/
+ifdown
+ifup
+
 touch sysctl.conf
 sudo sed -e "s/as needed.$/as needed.\n net.ipv4.ip_forward=1\n/" /etc/sysctl.conf >  sysctl.conf
 
@@ -91,7 +108,9 @@ sudo sed -e "s/as needed.$/as needed.\n net.ipv4.conf.all.rp.filter=0\n/" sysctl
 sudo cp sysctl.conf /etc/sysctl.conf
 
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-
+cat <<EOF | cat > local.sh
+for i in `seq 2 10`; do /opt/stack/nova/bin/nova-manage fixed reserve 10.4.128.$i; done
+EOF
 ./stack.sh
 
 #./unstack.sh
