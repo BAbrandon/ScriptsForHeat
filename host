@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 127.0.0.1 localhost brandon-controller-test
-=======
-127.0.0.1 localhost brandon-compute-test
->>>>>>> 4ffa2a85787ac57462e25ccb412965f7302de8a5
 
 # The following lines are desirable for IPv6 capable hosts
 ::1	ip6-localhost	ip6-loopback
@@ -11,9 +7,5 @@ ff00::0	ip6-mcastprefix
 ff02::1	ip6-allnodes
 ff02::2	ip6-allrouters
 ff02::3	ip6-allhosts
-<<<<<<< HEAD
 127.0.1.1	brandon-controller-test.novalocal	brandon-controller-test
-=======
-127.0.1.1	brandon-compute-test.novalocal	brandon-compute-test
->>>>>>> 4ffa2a85787ac57462e25ccb412965f7302de8a5
 
