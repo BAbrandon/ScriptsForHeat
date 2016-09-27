@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sleep 600
+
 
 sudo apt-get update
 sudo apt-get install -y git python-pip vim
@@ -9,7 +9,7 @@ sudo apt-get upgrade -y python
 
 touch host
 sudo sed -e "s/[ 	]*127.0.0.1[ 	]*localhost[ 	]*$/127.0.0.1 localhost $HOSTNAME/" /etc/hosts > host
-sudo cp -f host /etc/hosts
+sudo cp host /etc/hosts
 
 chown cc:cc /home/cc 
 cd /home/cc
@@ -33,9 +33,10 @@ SERVICE_PASSWORD=secret
 
 #network
 FLAT_INTERFACE=eth0
+FLOATING_RANGE=10.241.254.0/24
 FIXED_RANGE=192.168.1.0/24
 NETWORK_GATEWAY=192.168.1.1
-FIXED_NETWORK_SIZE=4096
+FIXED_NETWORK_SIZE=256
 PUBLIC_NETWORK_GATEWAY=10.241.254.253
 #HOST_IP=
 
@@ -73,21 +74,6 @@ VAR=$(ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'
 
 printf '\nHOST_IP=%s'$VAR'\n' >> local.conf
 
-
-
-touch interfaces
-cat <<EOF | cat > interfaces
-auto eth0
-iface eth0 inet static 
-        netmask 255.255.255.0
-        gateway 192.168.0.1
-EOF
-printf '        address '$VAR'\n' >> interfaces
-sudo cp -f interfaces /etc/network/
-ifdown 
-ifup
-
-
 touch sysctl.conf
 sudo sed -e "s/as needed.$/as needed.\n net.ipv4.ip_forward=1\n/" /etc/sysctl.conf >  sysctl.conf
 
@@ -95,12 +81,9 @@ sudo sed -e "s/as needed.$/as needed.\n net.ipv4.conf.default.rp.filter=0\n/" sy
 
 sudo sed -e "s/as needed.$/as needed.\n net.ipv4.conf.all.rp.filter=0\n/" sysctl.conf > sysctl.conf
 
-sudo cp -f sysctl.conf /etc/sysctl.conf
+sudo cp sysctl.conf /etc/sysctl.conf
 
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-
-
-
 
  ./stack.sh
 
